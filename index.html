@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fff8f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1f1a17" media="(prefers-color-scheme: dark)">
   <title>今天吃什麼？</title>
   <style>
+    /* 顏色都集中在這裡；深色模式跟隨系統設定（prefers-color-scheme）自動切換 */
     :root {
+      color-scheme: light dark;
       --bg: #fff8f0;
       --card: #ffffff;
       --text: #3a2e25;
@@ -13,6 +18,9 @@
       --accent: #ff6b35;
       --accent-dark: #e0521f;
       --chip: #ffe8d9;
+      --hint: #c2410c;
+      --hover: rgba(0, 0, 0, 0.1);
+      --shadow: rgba(0, 0, 0, 0.08);
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -21,6 +29,9 @@
         --text: #f5ebe2;
         --muted: #b3a295;
         --chip: #4a3326;
+        --hint: #ff9a6c;
+        --hover: rgba(255, 255, 255, 0.15);
+        --shadow: rgba(0, 0, 0, 0.4);
       }
     }
     * { box-sizing: border-box; }
@@ -42,7 +53,7 @@
       border-radius: 24px;
       padding: 32px 24px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px var(--shadow);
     }
     h1 { margin: 0 0 8px; font-size: 1.6rem; }
     .subtitle { margin: 0 0 24px; color: var(--muted); font-size: 0.95rem; }
@@ -125,7 +136,7 @@
       cursor: pointer;
       opacity: 0.6;
     }
-    .list .remove:hover { opacity: 1; background: rgba(0, 0, 0, 0.1); }
+    .list .remove:hover { opacity: 1; background: var(--hover); }
     .list .remove:disabled { visibility: hidden; }
     .empty { margin: 28px 0 0; color: var(--muted); font-size: 0.9rem; }
 
@@ -157,7 +168,7 @@
       cursor: pointer;
     }
     .add-form button:disabled { opacity: 0.6; cursor: not-allowed; }
-    .hint { min-height: 1.2em; margin: 8px 0 0; color: var(--accent-dark); font-size: 0.85rem; }
+    .hint { min-height: 1.2em; margin: 8px 0 0; color: var(--hint); font-size: 0.85rem; }
     .reset {
       margin-top: 4px;
       padding: 4px;
