@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今天吃什麼？</title>
+  <style>
+    :root {
+      --bg: #fff8f0;
+      --card: #ffffff;
+      --text: #3a2e25;
+      --muted: #8a7a6d;
+      --accent: #ff6b35;
+      --accent-dark: #e0521f;
+      --chip: #ffe8d9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1f1a17;
+        --card: #2b2420;
+        --text: #f5ebe2;
+        --muted: #b3a295;
+        --chip: #4a3326;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 1.6rem; }
+    .subtitle { margin: 0 0 24px; color: var(--muted); font-size: 0.95rem; }
+
+    .result-box {
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      border: 3px dashed var(--chip);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .result {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .result.placeholder { color: var(--muted); font-size: 1.1rem; font-weight: 400; }
+    .result.spinning { animation: flick 0.08s linear infinite; }
+    .result.done { color: var(--accent); animation: pop 0.45s ease-out; }
+
+    @keyframes flick {
+      from { transform: translateY(-30%); opacity: 0.4; }
+      to   { transform: translateY(30%);  opacity: 1; }
+    }
+    @keyframes pop {
+      0%   { transform: scale(0.6); }
+      60%  { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .go {
+      width: 100%;
+      padding: 20px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--accent-dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .go:hover { filter: brightness(1.05); }
+    .go:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--accent-dark); }
+    .go:disabled { opacity: 0.7; cursor: wait; }
+
+    .list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 28px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .list li {
+      background: var(--chip);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .list li.active { background: var(--accent); color: #fff; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>🍱 午餐選擇器</h1>
+    <p class="subtitle">選擇困難？交給命運吧！</p>
+
+    <div class="result-box">
+      <div id="result" class="result placeholder" aria-live="polite">按下按鈕開始抽籤</div>
+    </div>
+
+    <button id="go" class="go">今天吃什麼？</button>
+
+    <ul id="list" class="list"></ul>
+  </main>
+
+  <script>
+    const restaurants = [
+      "麥當勞",
+      "肯德基",
+      "摩斯漢堡",
+      "八方雲集",
+      "四海遊龍",
+      "吉野家",
+      "爭鮮",
+      "Subway",
+      "鼎泰豐",
+      "路邊自助餐"
+    ];
+
+    const resultEl = document.getElementById("result");
+    const button = document.getElementById("go");
+    const listEl = document.getElementById("list");
+
+    const items = restaurants.map(name => {
+      const li = document.createElement("li");
+      li.textContent = name;
+      listEl.appendChild(li);
+      return li;
+    });
+
+    function highlight(index) {
+      items.forEach((li, i) => li.classList.toggle("active", i === index));
+    }
+
+    button.addEventListener("click", () => {
+      button.disabled = true;
+      resultEl.className = "result spinning";
+
+      const finalIndex = Math.floor(Math.random() * restaurants.length);
+      const totalSteps = 25;
+      let step = 0;
+
+      // 由快到慢地輪流顯示店名，最後停在 finalIndex
+      function tick() {
+        const index = step === totalSteps
+          ? finalIndex
+          : Math.floor(Math.random() * restaurants.length);
+        resultEl.textContent = restaurants[index];
+        highlight(index);
+
+        if (step < totalSteps) {
+          step++;
+          setTimeout(tick, 40 + step * step * 0.3);
+        } else {
+          resultEl.className = "result done";
+          button.textContent = "再抽一次！";
+          button.disabled = false;
+        }
+      }
+      tick();
+    });
+  </script>
+</body>
+</html>
