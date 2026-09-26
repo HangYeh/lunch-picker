@@ -86,6 +86,21 @@
       100% { transform: scale(1); }
     }
 
+    /* 抽中後才顯示；用 visibility 保留位置，避免按鈕跳動 */
+    .map-link {
+      display: inline-block;
+      margin: -12px 0 16px;
+      padding: 6px 14px;
+      font-size: 0.95rem;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      border-radius: 999px;
+      text-decoration: none;
+      visibility: hidden;
+    }
+    .map-link.show { visibility: visible; }
+    .map-link:hover { background: var(--accent); color: #fff; }
+
     .go {
       width: 100%;
       padding: 20px;
@@ -190,6 +205,8 @@
       <div id="result" class="result placeholder" aria-live="polite">按下按鈕開始抽籤</div>
     </div>
 
+    <a id="map-link" class="map-link" target="_blank" rel="noopener">📍 在 Google 地圖找最近的</a>
+
     <button id="go" class="go">今天吃什麼？</button>
 
     <ul id="list" class="list"></ul>
@@ -226,6 +243,7 @@
     const input = document.getElementById("new-name");
     const hintEl = document.getElementById("hint");
     const resetBtn = document.getElementById("reset");
+    const mapLink = document.getElementById("map-link");
 
     let restaurants = load();
     let items = [];
@@ -306,6 +324,13 @@
       render();
     });
 
+    // Google 地圖會依使用者目前位置排序搜尋結果；手機上會直接開啟地圖 App
+    function showMapLink(name) {
+      mapLink.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name);
+      mapLink.textContent = `📍 在 Google 地圖找最近的「${name}」`;
+      mapLink.classList.add("show");
+    }
+
     function highlight(index) {
       items.forEach((li, i) => li.classList.toggle("active", i === index));
     }
@@ -315,6 +340,7 @@
       spinning = true;
       render();
       resultEl.className = "result spinning";
+      mapLink.classList.remove("show");
 
       const finalIndex = Math.floor(Math.random() * restaurants.length);
       const totalSteps = 25;
@@ -337,6 +363,7 @@
           highlight(finalIndex);
           resultEl.className = "result done";
           button.textContent = "再抽一次！";
+          showMapLink(restaurants[finalIndex]);
         }
       }
       tick();
